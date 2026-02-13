@@ -15,7 +15,7 @@ document.querySelectorAll(".paper").forEach((paper) => {
     offsetY = y - rect.top;
   }
 
-  function dragMove(x, y) {
+  function moveDrag(x, y) {
     if (!isDragging) return;
 
     paper.style.left = x - offsetX + "px";
@@ -26,27 +26,37 @@ document.querySelectorAll(".paper").forEach((paper) => {
     isDragging = false;
   }
 
-  // 🖱️ MOUSE EVENTS
+  // 🖱 DESKTOP
   paper.addEventListener("mousedown", (e) => {
     startDrag(e.clientX, e.clientY);
   });
 
   document.addEventListener("mousemove", (e) => {
-    dragMove(e.clientX, e.clientY);
+    moveDrag(e.clientX, e.clientY);
   });
 
   document.addEventListener("mouseup", endDrag);
 
-  // 📱 TOUCH EVENTS
-  paper.addEventListener("touchstart", (e) => {
-    const touch = e.touches[0];
-    startDrag(touch.clientX, touch.clientY);
-  });
+  // 📱 MOBILE
+  paper.addEventListener(
+    "touchstart",
+    (e) => {
+      e.preventDefault(); // ⭐ stops screen dragging
+      const touch = e.touches[0];
+      startDrag(touch.clientX, touch.clientY);
+    },
+    { passive: false },
+  );
 
-  document.addEventListener("touchmove", (e) => {
-    const touch = e.touches[0];
-    dragMove(touch.clientX, touch.clientY);
-  });
+  document.addEventListener(
+    "touchmove",
+    (e) => {
+      e.preventDefault(); // ⭐ VERY IMPORTANT
+      const touch = e.touches[0];
+      moveDrag(touch.clientX, touch.clientY);
+    },
+    { passive: false },
+  );
 
   document.addEventListener("touchend", endDrag);
 });
