@@ -5,7 +5,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-
+  overflow: hidden;
   background-size: 1000px;
   background-image: url("https://www.psdgraphics.com/wp-content/uploads/2022/01/white-math-paper-texture.jpg");
   background-position: center center;
@@ -83,4 +83,9 @@ p {
   height: 100%;
   pointer-events: none;
   z-index: -1;
+}
+
+.paper {
+  position: absolute;
+  touch-action: none;
 }
