@@ -1,82 +1,59 @@
 let highestZ = 1;
 
-class Paper {
-  holdingPaper = false;
-  mouseTouchX = 0;
-  mouseTouchY = 0;
-  mouseX = 0;
-  mouseY = 0;
-  prevMouseX = 0;
-  prevMouseY = 0;
-  velX = 0;
-  velY = 0;
-  rotation = Math.random() * 30 - 15;
-  currentPaperX = 0;
-  currentPaperY = 0;
-  rotating = false;
+document.querySelectorAll(".paper").forEach((paper) => {
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDragging = false;
 
-  init(paper) {
-    document.addEventListener('mousemove', (e) => {
-      if(!this.rotating) {
-        this.mouseX = e.clientX;
-        this.mouseY = e.clientY;
-        
-        this.velX = this.mouseX - this.prevMouseX;
-        this.velY = this.mouseY - this.prevMouseY;
-      }
-        
-      const dirX = e.clientX - this.mouseTouchX;
-      const dirY = e.clientY - this.mouseTouchY;
-      const dirLength = Math.sqrt(dirX*dirX+dirY*dirY);
-      const dirNormalizedX = dirX / dirLength;
-      const dirNormalizedY = dirY / dirLength;
+  function startDrag(x, y) {
+    isDragging = true;
+    highestZ++;
+    paper.style.zIndex = highestZ;
 
-      const angle = Math.atan2(dirNormalizedY, dirNormalizedX);
-      let degrees = 180 * angle / Math.PI;
-      degrees = (360 + Math.round(degrees)) % 360;
-      if(this.rotating) {
-        this.rotation = degrees;
-      }
-
-      if(this.holdingPaper) {
-        if(!this.rotating) {
-          this.currentPaperX += this.velX;
-          this.currentPaperY += this.velY;
-        }
-        this.prevMouseX = this.mouseX;
-        this.prevMouseY = this.mouseY;
-
-        paper.style.transform = `translateX(${this.currentPaperX}px) translateY(${this.currentPaperY}px) rotateZ(${this.rotation}deg)`;
-      }
-    })
-
-    paper.addEventListener('mousedown', (e) => {
-      if(this.holdingPaper) return; 
-      this.holdingPaper = true;
-      
-      paper.style.zIndex = highestZ;
-      highestZ += 1;
-      
-      if(e.button === 0) {
-        this.mouseTouchX = this.mouseX;
-        this.mouseTouchY = this.mouseY;
-        this.prevMouseX = this.mouseX;
-        this.prevMouseY = this.mouseY;
-      }
-      if(e.button === 2) {
-        this.rotating = true;
-      }
-    });
-    window.addEventListener('mouseup', () => {
-      this.holdingPaper = false;
-      this.rotating = false;
-    });
+    const rect = paper.getBoundingClientRect();
+    offsetX = x - rect.left;
+    offsetY = y - rect.top;
   }
-}
 
-const papers = Array.from(document.querySelectorAll('.paper'));
+  function dragMove(x, y) {
+    if (!isDragging) return;
 
-papers.forEach(paper => {
+    paper.style.left = x - offsetX + "px";
+    paper.style.top = y - offsetY + "px";
+  }
+
+  function endDrag() {
+    isDragging = false;
+  }
+
+  // 🖱️ MOUSE EVENTS
+  paper.addEventListener("mousedown", (e) => {
+    startDrag(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    dragMove(e.clientX, e.clientY);
+  });
+
+  document.addEventListener("mouseup", endDrag);
+
+  // 📱 TOUCH EVENTS
+  paper.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    startDrag(touch.clientX, touch.clientY);
+  });
+
+  document.addEventListener("touchmove", (e) => {
+    const touch = e.touches[0];
+    dragMove(touch.clientX, touch.clientY);
+  });
+
+  document.addEventListener("touchend", endDrag);
+});
+
+const papers = Array.from(document.querySelectorAll(".paper"));
+
+papers.forEach((paper) => {
   const p = new Paper();
   p.init(paper);
 });
@@ -95,7 +72,7 @@ window.addEventListener("resize", () => {
 
 let particles = [];
 
-function createFirework(x, y, heart=false) {
+function createFirework(x, y, heart = false) {
   for (let i = 0; i < 40; i++) {
     let angle = Math.random() * Math.PI * 2;
     let speed = Math.random() * 4 + 2;
@@ -106,7 +83,7 @@ function createFirework(x, y, heart=false) {
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
       life: 100,
-      heart: heart
+      heart: heart,
     });
   }
 }
@@ -115,43 +92,43 @@ function createSparkle(x, y) {
   particles.push({
     x: x,
     y: y,
-    vx: (Math.random()-0.5)*2,
-    vy: (Math.random()-0.5)*2,
+    vx: (Math.random() - 0.5) * 2,
+    vy: (Math.random() - 0.5) * 2,
     life: 40,
-    heart: false
+    heart: false,
   });
 }
 
-function drawHeart(x,y,size){
+function drawHeart(x, y, size) {
   ctx.beginPath();
-  ctx.moveTo(x,y);
-  ctx.bezierCurveTo(x,y-size,x-size,y-size,x-size,y);
-  ctx.bezierCurveTo(x-size,y+size,x,y+size*1.4,x,y+size*2);
-  ctx.bezierCurveTo(x,y+size*1.4,x+size,y+size,x+size,y);
-  ctx.bezierCurveTo(x+size,y-size,x,y-size,x,y);
+  ctx.moveTo(x, y);
+  ctx.bezierCurveTo(x, y - size, x - size, y - size, x - size, y);
+  ctx.bezierCurveTo(x - size, y + size, x, y + size * 1.4, x, y + size * 2);
+  ctx.bezierCurveTo(x, y + size * 1.4, x + size, y + size, x + size, y);
+  ctx.bezierCurveTo(x + size, y - size, x, y - size, x, y);
   ctx.fill();
 }
 
 function animate() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  particles.forEach((p,i)=>{
-    p.x+=p.vx;
-    p.y+=p.vy;
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
     p.life--;
 
-    ctx.globalAlpha = p.life/100;
+    ctx.globalAlpha = p.life / 100;
 
-    if(p.heart){
+    if (p.heart) {
       ctx.fillStyle = "#8B0000";
-      drawHeart(p.x,p.y,3);
+      drawHeart(p.x, p.y, 3);
     } else {
-      ctx.fillStyle="white";
-      ctx.fillRect(p.x,p.y,2,2);
+      ctx.fillStyle = "white";
+      ctx.fillRect(p.x, p.y, 2, 2);
     }
 
-    if(p.life<=0){
-      particles.splice(i,1);
+    if (p.life <= 0) {
+      particles.splice(i, 1);
     }
   });
 
@@ -159,34 +136,31 @@ function animate() {
 }
 animate();
 
-
 // 💖 BIG FIREWORKS ON LOAD
-for(let i=0;i<6;i++){
-  setTimeout(()=>{
+for (let i = 0; i < 6; i++) {
+  setTimeout(() => {
     createFirework(
-      Math.random()*canvas.width,
-      Math.random()*canvas.height/2,
-      true
+      Math.random() * canvas.width,
+      (Math.random() * canvas.height) / 2,
+      true,
     );
-  },i*400);
+  }, i * 400);
 }
 
-
 // ✨ SPARKLES WHILE DRAGGING PAPERS
-document.querySelectorAll(".paper").forEach(paper=>{
-  paper.addEventListener("mousemove",(e)=>{
-    if(e.buttons===1){
-      createSparkle(e.clientX,e.clientY);
+document.querySelectorAll(".paper").forEach((paper) => {
+  paper.addEventListener("mousemove", (e) => {
+    if (e.buttons === 1) {
+      createSparkle(e.clientX, e.clientY);
     }
   });
 });
 
-
 // 🎇 RANDOM REALISTIC FIREWORKS LOOP
-setInterval(()=>{
+setInterval(() => {
   createFirework(
-    Math.random()*canvas.width,
-    Math.random()*canvas.height/2,
-    Math.random()>0.5
+    Math.random() * canvas.width,
+    (Math.random() * canvas.height) / 2,
+    Math.random() > 0.5,
   );
-},2000);
+}, 2000);
