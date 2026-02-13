@@ -61,13 +61,6 @@ document.querySelectorAll(".paper").forEach((paper) => {
   document.addEventListener("touchend", endDrag);
 });
 
-const papers = Array.from(document.querySelectorAll(".paper"));
-
-papers.forEach((paper) => {
-  const p = new Paper();
-  p.init(paper);
-});
-
 // 🎆 FIREWORKS SYSTEM
 const canvas = document.getElementById("fireworksCanvas");
 const ctx = canvas.getContext("2d");
@@ -82,7 +75,7 @@ window.addEventListener("resize", () => {
 
 let particles = [];
 
-function createFirework(x, y, heart = false) {
+function createFirework(x, y, heart=false) {
   for (let i = 0; i < 40; i++) {
     let angle = Math.random() * Math.PI * 2;
     let speed = Math.random() * 4 + 2;
@@ -93,7 +86,7 @@ function createFirework(x, y, heart = false) {
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
       life: 100,
-      heart: heart,
+      heart: heart
     });
   }
 }
@@ -102,43 +95,43 @@ function createSparkle(x, y) {
   particles.push({
     x: x,
     y: y,
-    vx: (Math.random() - 0.5) * 2,
-    vy: (Math.random() - 0.5) * 2,
+    vx: (Math.random()-0.5)*2,
+    vy: (Math.random()-0.5)*2,
     life: 40,
-    heart: false,
+    heart: false
   });
 }
 
-function drawHeart(x, y, size) {
+function drawHeart(x,y,size){
   ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.bezierCurveTo(x, y - size, x - size, y - size, x - size, y);
-  ctx.bezierCurveTo(x - size, y + size, x, y + size * 1.4, x, y + size * 2);
-  ctx.bezierCurveTo(x, y + size * 1.4, x + size, y + size, x + size, y);
-  ctx.bezierCurveTo(x + size, y - size, x, y - size, x, y);
+  ctx.moveTo(x,y);
+  ctx.bezierCurveTo(x,y-size,x-size,y-size,x-size,y);
+  ctx.bezierCurveTo(x-size,y+size,x,y+size*1.4,x,y+size*2);
+  ctx.bezierCurveTo(x,y+size*1.4,x+size,y+size,x+size,y);
+  ctx.bezierCurveTo(x+size,y-size,x,y-size,x,y);
   ctx.fill();
 }
 
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  particles.forEach((p, i) => {
-    p.x += p.vx;
-    p.y += p.vy;
+  particles.forEach((p,i)=>{
+    p.x+=p.vx;
+    p.y+=p.vy;
     p.life--;
 
-    ctx.globalAlpha = p.life / 100;
+    ctx.globalAlpha = p.life/100;
 
-    if (p.heart) {
+    if(p.heart){
       ctx.fillStyle = "#8B0000";
-      drawHeart(p.x, p.y, 3);
+      drawHeart(p.x,p.y,3);
     } else {
-      ctx.fillStyle = "white";
-      ctx.fillRect(p.x, p.y, 2, 2);
+      ctx.fillStyle="white";
+      ctx.fillRect(p.x,p.y,2,2);
     }
 
-    if (p.life <= 0) {
-      particles.splice(i, 1);
+    if(p.life<=0){
+      particles.splice(i,1);
     }
   });
 
@@ -146,31 +139,34 @@ function animate() {
 }
 animate();
 
+
 // 💖 BIG FIREWORKS ON LOAD
-for (let i = 0; i < 6; i++) {
-  setTimeout(() => {
+for(let i=0;i<6;i++){
+  setTimeout(()=>{
     createFirework(
-      Math.random() * canvas.width,
-      (Math.random() * canvas.height) / 2,
-      true,
+      Math.random()*canvas.width,
+      Math.random()*canvas.height/2,
+      true
     );
-  }, i * 400);
+  },i*400);
 }
 
+
 // ✨ SPARKLES WHILE DRAGGING PAPERS
-document.querySelectorAll(".paper").forEach((paper) => {
-  paper.addEventListener("mousemove", (e) => {
-    if (e.buttons === 1) {
-      createSparkle(e.clientX, e.clientY);
+document.querySelectorAll(".paper").forEach(paper=>{
+  paper.addEventListener("mousemove",(e)=>{
+    if(e.buttons===1){
+      createSparkle(e.clientX,e.clientY);
     }
   });
 });
 
+
 // 🎇 RANDOM REALISTIC FIREWORKS LOOP
-setInterval(() => {
+setInterval(()=>{
   createFirework(
-    Math.random() * canvas.width,
-    (Math.random() * canvas.height) / 2,
-    Math.random() > 0.5,
+    Math.random()*canvas.width,
+    Math.random()*canvas.height/2,
+    Math.random()>0.5
   );
-}, 2000);
+},2000);
